@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bevy Test</title>
+    <style>
+        canvas {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import init from './pkg/bevy_test.js';
+        init().then(bevy_test => bevy_test.main());
+    </script>
+</body>
+</html>
