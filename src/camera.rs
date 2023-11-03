@@ -18,11 +18,16 @@ pub struct CameraTarget {
     align_rotation: bool,
 }
 
+#[derive(Component)]
+pub struct CameraAnchor;
+
 const MAX_CAMERA_ZOOM_PERCENT_CHANGE: f32 = 10.0;
 const MAX_CAMERA_MOVE_SPEED: f32 = 200.0;
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((CameraAnchor, TransformBundle::default())).with_children(|parent| {
+        parent.spawn(Camera2dBundle::default());
+    });
 }
 
 fn camera_zoom_system(
@@ -57,8 +62,8 @@ fn camera_input_system(
 }
 
 fn camera_track_target(
-    mut query: Query<&mut Transform, With<Camera>>,
-    target_query: Query<(&Transform, &CameraTarget), Without<Camera>>,
+    mut query: Query<&mut Transform, With<CameraAnchor>>,
+    target_query: Query<(&Transform, &CameraTarget), Without<CameraAnchor>>,
 ) {
     let (target_tr, target) = target_query.single();
     let mut camera = query.single_mut();

@@ -61,10 +61,12 @@ fn generate_path<'a>(
     let mut pos = ship_pos;
     let mut vel = ship_vel;
     let mut distance_travelled = 0.0;
+    let mut iter = 0;
 
-    for _ in 0..1000 {
+    while distance_travelled < 1e5 && iter < 10000 {
         path.push(pos);
         generate_next_path_point(&mut pos, &mut vel, &mut distance_travelled, affectors);
+        iter += 1;
     }
 
     path
