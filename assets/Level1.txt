@@ -1,2 +1,2 @@
 Planet 5000 0 1000
-Planet 40000 0 300
+Planet 8e4 0 300

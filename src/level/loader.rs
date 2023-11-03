@@ -1,4 +1,7 @@
-use bevy::{asset::{AssetLoader, LoadedAsset}, prelude::*};
+use bevy::{
+    asset::{AssetLoader, LoadedAsset, Error},
+    prelude::*,
+};
 
 use crate::level::LevelAssetObject;
 
@@ -13,8 +16,8 @@ impl AssetLoader for LevelAssetLoader {
         load_context: &'a mut bevy::asset::LoadContext,
     ) -> bevy::utils::BoxedFuture<'a, Result<(), bevy::asset::Error>> {
         Box::pin(async move {
-            let string = std::str::from_utf8(bytes).map_err(bevy::asset::Error::new)?;
-            let level = parse_level(string);
+            let string = std::str::from_utf8(bytes).map_err(Error::new)?;
+            let level = parse_level(string)?;
             load_context.set_default_asset(LoadedAsset::new(level));
             Ok(())
         })
@@ -25,31 +28,31 @@ impl AssetLoader for LevelAssetLoader {
     }
 }
 
-fn parse_level(source: &str) -> LevelAsset {
+fn parse_level(source: &str) -> Result<LevelAsset, Error> {
     let objects = source
         .lines()
-        .filter_map(parse_line)
-        .collect::<Vec<_>>();
+        .map(parse_line)
+        .collect::<Result<Vec<_>, _>>()?;
 
-    LevelAsset { objects }
+    Ok(LevelAsset { objects })
 }
 
-fn parse_line(line: &str) -> Option<LevelAssetObject> {
+fn parse_line(line: &str) -> Result<LevelAssetObject, Error> {
     let line = line.trim();
     if !line.starts_with("Planet ") {
-        return None;
+        return Err(Error::msg("Invalid line"));
     }
 
     let parts = line.split(' ').collect::<Vec<_>>();
     if parts.len() != 4 {
-        return None;
+        return Err(Error::msg("Invalid line"));
     }
 
-    let x = parts[1].parse::<f32>().ok()?;
-    let y = parts[2].parse::<f32>().ok()?;
-    let radius = parts[3].parse::<f32>().ok()?;
-    Some(LevelAssetObject::Planet {
+    let x = parts[1].parse::<f32>()?;
+    let y = parts[2].parse::<f32>()?;
+    let radius = parts[3].parse::<f32>()?;
+    Ok(LevelAssetObject::Planet {
         radius,
-        position: Vec2::new(x, y)
+        position: Vec2::new(x, y),
     })
 }

@@ -1,3 +1,3 @@
 fn main() {
-    bevy_test::main();
+    space_game::main();
 }
